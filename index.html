@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fechador Digital - Ticket Térmico de Fe Cierta</title>
+  <title>Ticket de Fecha - Fe Cierta</title>
   <style>
     :root {
       --bg-color: #0b0f19;
       --card-bg: #161e2e;
       --accent-color: #0284c7;
-      --ticket-bg: #f8fafc;
-      --ticket-text: #1e293b;
+      --ticket-bg: #f5f3f7; /* Fondo papel térmico ligeramente violáceo/gris */
+      --ticket-text: #2c223b;
       --thermal-purple: #4c1d95;
+      --thermal-gray: #4b5563;
     }
 
     body {
@@ -27,7 +28,7 @@
 
     .container {
       width: 100%;
-      max-width: 800px;
+      max-width: 600px; /* Ancho optimizado para simular tira de ticket vertical */
       background: var(--card-bg);
       padding: 24px;
       border-radius: 12px;
@@ -38,7 +39,7 @@
     h1 {
       text-align: center;
       margin-bottom: 20px;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: #38bdf8;
     }
 
@@ -47,14 +48,14 @@
       background: #090d16;
       border: 1px solid #334155;
       border-radius: 8px;
-      padding: 16px;
+      padding: 14px;
       text-align: center;
       font-family: monospace;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .clock-live {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: bold;
       color: #22c55e;
       letter-spacing: 1px;
@@ -78,12 +79,12 @@
       display: none;
     }
 
-    /* Estilo visual del Ticket Térmico en la web */
+    /* Estilo visual del Ticket Térmico vertical en pantalla */
     .certificate-card {
       background: var(--ticket-bg);
       color: var(--ticket-text);
       border-radius: 4px;
-      padding: 24px;
+      padding: 20px;
       margin-top: 20px;
       display: none;
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
@@ -94,11 +95,11 @@
 
     .ticket-header-text {
       text-align: center;
-      font-size: 0.85rem;
-      color: #475569;
+      font-size: 0.8rem;
+      color: var(--thermal-gray);
       margin-bottom: 12px;
-      border-bottom: 1px dashed #94a3b8;
-      padding-bottom: 8px;
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 6px;
       letter-spacing: 1px;
     }
 
@@ -111,19 +112,19 @@
 
     .preview-img {
       max-width: 100%;
-      max-height: 400px;
+      max-height: 450px;
       display: block;
       margin: 0 auto;
       border-radius: 2px;
-      border: 1px solid #94a3b8;
+      border: 1px solid #cbd5e1;
       object-fit: contain;
     }
 
     .ticket-data {
-      font-size: 0.88rem;
+      font-size: 0.84rem;
       line-height: 1.5;
-      border-top: 1px dashed #94a3b8;
-      padding-top: 12px;
+      border-top: 1px dashed #cbd5e1;
+      padding-top: 10px;
       word-break: break-all;
     }
 
@@ -134,9 +135,9 @@
       text-align: center;
       color: var(--thermal-purple);
       font-weight: bold;
-      background: rgba(76, 29, 149, 0.03);
+      background: rgba(76, 29, 149, 0.04);
       text-transform: uppercase;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
     }
 
     .btn {
@@ -162,24 +163,24 @@
 <body>
 
 <div class="container">
-  <h1>Fechador Digital - Ticket Térmico</h1>
+  <h1>Ticket de Fecha - Sistema de Fe Cierta</h1>
 
   <!-- Línea de tiempo en tiempo real (Bs. As.) -->
   <div class="timeline-bar">
-    <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px;">LÍNEA DE TIEMPO EN VIVO (HORA BUENOS AIRES - ARGENTINA)</div>
+    <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px;">LÍNEA DE TIEMPO EN VIVO (HORA BUENOS AIRES - ARGENTINA)</div>
     <div class="clock-live" id="liveClock">0000-00-00 00:00:00.000</div>
   </div>
 
   <!-- Zona de carga -->
   <div class="upload-zone" onclick="document.getElementById('imgInput').click()">
-    <p>📁 Haz clic o arrastra una imagen aquí para emitir ticket</p>
+    <p>📁 Haz clic o arrastra una imagen aquí para emitir el Ticket</p>
     <input type="file" id="imgInput" accept="image/*" onchange="processImage(this.files[0])">
   </div>
 
-  <!-- Vista Previa del Ticket Térmico -->
+  <!-- Vista Previa del Ticket Térmico Vertical -->
   <div class="certificate-card" id="certificate">
     <div class="ticket-header-text">
-      BOL. 245828 :: COD. ENT. 00027 :: SUC. 053 :: CAJERO 64750
+      TICKET DE FECHA :: REGISTRO DIGITAL AUTÓNOMO
     </div>
 
     <div class="preview-container">
@@ -187,23 +188,23 @@
     </div>
 
     <div class="ticket-data">
-      <div><strong>FECHA / HORA (BS.AS.):</strong> <span id="recTime">--</span></div>
-      <div><strong>HASH-ID (SHA-256):</strong> <span id="recHash" style="color: #4c1d95;">--</span></div>
+      <div><strong>FECHA Y HORA (BS.AS.):</strong> <span id="recTime">--</span></div>
+      <div><strong>HASH-ID (SHA-256):</strong> <span id="recHash" style="color: var(--thermal-purple); font-weight: bold;">--</span></div>
       <div><strong>PESO / TAMAÑO:</strong> <span id="recSize">--</span></div>
       <div><strong>ARCHIVO:</strong> <span id="recName">--</span></div>
       <div><strong>GEOLOCALIZACIÓN:</strong> <span id="recGeo">Obteniendo coordenadas...</span></div>
     </div>
 
     <div class="ticket-stamp-box">
-      <div>REGISTRO DE FE CIERTA :: OPERACIÓN VALIDADA DIGITALMENTE</div>
-      <div style="font-size: 0.7rem; margin-top: 3px; font-family: monospace;" id="stampTimeCode">00:00:00.000</div>
+      <div>REGISTRO DE FE CIERTA :: VERIFICADO</div>
+      <div style="font-size: 0.68rem; margin-top: 3px; font-family: monospace;" id="stampTimeCode">00:00:00.000</div>
     </div>
 
-    <button class="btn" onclick="downloadThermalTicketJPG()">📥 Descargar Ticket en JPG</button>
+    <button class="btn" onclick="downloadThermalTicketJPG()">📥 Descargar Ticket Vertical (JPG)</button>
   </div>
 </div>
 
-<!-- Canvas oculto para armar el ticket térmico integrado -->
+<!-- Canvas oculto para armar el ticket térmico vertical integrado -->
 <canvas id="exportCanvas" style="display:none;"></canvas>
 
 <script>
@@ -297,7 +298,7 @@
     }
   }
 
-  // Generación y descarga del Ticket Térmico Integrado en JPG
+  // Generación y descarga del Ticket Térmico Vertical en JPG
   function downloadThermalTicketJPG() {
     if (!loadedImageObj.complete || loadedImageObj.naturalWidth === 0) {
       alert("La imagen aún se está procesando. Aguardá un momento.");
@@ -310,35 +311,35 @@
     const origW = loadedImageObj.naturalWidth;
     const origH = loadedImageObj.naturalHeight;
 
-    // Altura del bloque de ticket térmico al pie
-    const ticketFooterHeight = Math.max(340, Math.round(origH * 0.32));
+    // Altura del bloque de ticket térmico al pie (proporcional a la imagen)
+    const ticketFooterHeight = Math.max(380, Math.round(origH * 0.35));
 
     canvas.width = origW;
     canvas.height = origH + ticketFooterHeight;
 
-    // 1. Fondo general de papel térmico analógico (blanco ligeramente texturado/gris cálido)
-    ctx.fillStyle = "#f8fafc";
+    // 1. Fondo de papel térmico (tonos grises y violáceos pálidos)
+    ctx.fillStyle = "#f5f3f7";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // 2. Dibujar la imagen original al 100% de nitidez arriba
     ctx.drawImage(loadedImageObj, 0, 0, origW, origH);
 
-    // 3. Franja de corte / Línea punteada de matriz de puntos
+    // 3. Línea punteada de corte térmico
     const footerTop = origH;
     ctx.strokeStyle = "#94a3b8";
     ctx.lineWidth = Math.max(3, Math.round(origW * 0.004));
-    ctx.setLineDash([10, 8]);
+    ctx.setLineDash([12, 8]);
     ctx.beginPath();
     ctx.moveTo(0, footerTop);
     ctx.lineTo(origW, footerTop);
     ctx.stroke();
-    ctx.setLineDash([]); // Resetear patrón de línea
+    ctx.setLineDash([]);
 
-    // Fondo del cuerpo del ticket inferior
-    ctx.fillStyle = "#f8fafc";
+    // Fondo del bloque inferior del ticket
+    ctx.fillStyle = "#f5f3f7";
     ctx.fillRect(0, footerTop + 4, origW, ticketFooterHeight - 4);
 
-    // Textos con tipografía de impresora de ticket (Courier / Monospace)
+    // Tintas térmicas entintadas (violáceos y grises oscuros más marcados)
     const padLeft = Math.round(origW * 0.04);
     const fontHeader = Math.max(12, Math.round(origW * 0.018));
     const fontBody = Math.max(12, Math.round(origW * 0.019));
@@ -346,58 +347,58 @@
 
     ctx.textAlign = "left";
 
-    // Encabezado térmico
+    // Encabezado limpio sin bancos ni cajeros
     ctx.font = "bold " + fontHeader + "px 'Courier New', monospace";
-    ctx.fillStyle = "#475569";
-    ctx.fillText("BOL. 245828 :: COD. ENT. 00027 :: SUC. 053 :: CAJERO 64750", padLeft, footerTop + 35);
+    ctx.fillStyle = "#4b5563";
+    ctx.fillText("TICKET DE FECHA :: REGISTRO DIGITAL AUTÓNOMO", padLeft, footerTop + 38);
 
-    // Datos principales del ticket
+    // Datos principales con tintas violáceas/grises profundas
     ctx.font = "bold " + fontBody + "px 'Courier New', monospace";
-    ctx.fillStyle = "#1e293b";
+    ctx.fillStyle = "#2c223b";
     
-    let currentY = footerTop + 70;
-    const lineSpacing = Math.round(fontBody * 1.6);
+    let currentY = footerTop + 75;
+    const lineSpacing = Math.round(fontBody * 1.65);
 
-    ctx.fillText("FECHA / HORA (BS.AS.): " + formattedTimeCache, padLeft, currentY);
+    ctx.fillText("FECHA Y HORA (BS.AS.): " + formattedTimeCache, padLeft, currentY);
     currentY += lineSpacing;
     
     ctx.fillText("HASH-ID (SHA-256):", padLeft, currentY);
     currentY += lineSpacing;
     
     ctx.font = "bold " + Math.max(10, Math.round(fontBody * 0.85)) + "px 'Courier New', monospace";
-    ctx.fillStyle = "#4c1d95";
+    ctx.fillStyle = "#4c1d95"; // Tinta violácea intensa para el Hash
     ctx.fillText(currentHashHex, padLeft, currentY);
     currentY += lineSpacing;
 
     ctx.font = "bold " + fontBody + "px 'Courier New', monospace";
-    ctx.fillStyle = "#1e293b";
+    ctx.fillStyle = "#2c223b";
     ctx.fillText("PESO / TAMAÑO: " + (currentFile ? (currentFile.size / 1024).toFixed(2) + " KB" : "--"), padLeft, currentY);
     currentY += lineSpacing;
 
     ctx.fillText("GEOLOCALIZACIÓN: " + geoTextCache, padLeft, currentY);
-    currentY += lineSpacing + 5;
+    currentY += lineSpacing + 8;
 
-    // Sello entintado violáceo inferior (Estilo cajero/escribanía)
-    const stampBoxHeight = 55;
+    // Sello entintado violáceo inferior con borde marcado estilo ticket de escribanía/trámite
+    const stampBoxHeight = 58;
     const stampBoxWidth = origW - (padLeft * 2);
     
     ctx.strokeStyle = "#4c1d95";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.strokeRect(padLeft, currentY, stampBoxWidth, stampBoxHeight);
 
-    ctx.fillStyle = "rgba(76, 29, 149, 0.06)";
+    ctx.fillStyle = "rgba(76, 29, 149, 0.07)";
     ctx.fillRect(padLeft, currentY, stampBoxWidth, stampBoxHeight);
 
     ctx.fillStyle = "#4c1d95";
     ctx.textAlign = "center";
     ctx.font = "bold " + fontStamp + "px 'Courier New', monospace";
-    ctx.fillText("REGISTRO DE FE CIERTA :: OPERACIÓN VALIDADA", padLeft + (stampBoxWidth / 2), currentY + 22);
+    ctx.fillText("REGISTRO DE FE CIERTA :: VERIFICADO", padLeft + (stampBoxWidth / 2), currentY + 23);
 
     ctx.font = "bold " + Math.max(11, Math.round(fontStamp * 0.85)) + "px 'Courier New', monospace";
     const timeOnly = formattedTimeCache.split(' ')[1] || formattedTimeCache;
-    ctx.fillText("HORA EXACTA: " + timeOnly, padLeft + (stampBoxWidth / 2), currentY + 44);
+    ctx.fillText("HORA EXACTA: " + timeOnly, padLeft + (stampBoxWidth / 2), currentY + 45);
 
-    // 4. Descarga directa en JPG del Ticket Térmico Completo
+    // 4. Descarga directa en JPG del Ticket Vertical Integrado
     const link = document.createElement('a');
     link.download = 'Ticket_FeCierta_' + Date.now() + '.jpg';
     link.href = canvas.toDataURL('image/jpeg', 0.95);
