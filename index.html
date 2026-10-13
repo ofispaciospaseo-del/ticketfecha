@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fechador Digital - Ticket Térmico de Fe Cierta</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #161e2e;
+      --accent-color: #0284c7;
+      --ticket-bg: #f8fafc;
+      --ticket-text: #1e293b;
+      --thermal-purple: #4c1d95;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: #f8fafc;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: #38bdf8;
+    }
+
+    /* Línea de tiempo en tiempo real (Bs. As.) */
+    .timeline-bar {
+      background: #090d16;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      font-family: monospace;
+      margin-bottom: 24px;
+    }
+
+    .clock-live {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #22c55e;
+      letter-spacing: 1px;
+    }
+
+    .upload-zone {
+      border: 2px dashed #475569;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+      background: #111827;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--accent-color);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    /* Estilo visual del Ticket Térmico en la web */
+    .certificate-card {
+      background: var(--ticket-bg);
+      color: var(--ticket-text);
+      border-radius: 4px;
+      padding: 24px;
+      margin-top: 20px;
+      display: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      font-family: 'Courier New', Courier, monospace;
+      border-top: 6px dashed #cbd5e1;
+      border-bottom: 6px dashed #cbd5e1;
+    }
+
+    .ticket-header-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #475569;
+      margin-bottom: 12px;
+      border-bottom: 1px dashed #94a3b8;
+      padding-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .preview-container {
+      position: relative;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      max-height: 400px;
+      display: block;
+      margin: 0 auto;
+      border-radius: 2px;
+      border: 1px solid #94a3b8;
+      object-fit: contain;
+    }
+
+    .ticket-data {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      border-top: 1px dashed #94a3b8;
+      padding-top: 12px;
+      word-break: break-all;
+    }
+
+    .ticket-stamp-box {
+      margin-top: 15px;
+      border: 2px solid var(--thermal-purple);
+      padding: 10px;
+      text-align: center;
+      color: var(--thermal-purple);
+      font-weight: bold;
+      background: rgba(76, 29, 149, 0.03);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+    }
+
+    .btn {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 20px;
+      width: 100%;
+      font-size: 1rem;
+      text-align: center;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    .btn:hover {
+      background: #0369a1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Fechador Digital - Ticket Térmico</h1>
+
+  <!-- Línea de tiempo en tiempo real (Bs. As.) -->
+  <div class="timeline-bar">
+    <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px;">LÍNEA DE TIEMPO EN VIVO (HORA BUENOS AIRES - ARGENTINA)</div>
+    <div class="clock-live" id="liveClock">0000-00-00 00:00:00.000</div>
+  </div>
+
+  <!-- Zona de carga -->
+  <div class="upload-zone" onclick="document.getElementById('imgInput').click()">
+    <p>📁 Haz clic o arrastra una imagen aquí para emitir ticket</p>
+    <input type="file" id="imgInput" accept="image/*" onchange="processImage(this.files[0])">
+  </div>
+
+  <!-- Vista Previa del Ticket Térmico -->
+  <div class="certificate-card" id="certificate">
+    <div class="ticket-header-text">
+      BOL. 245828 :: COD. ENT. 00027 :: SUC. 053 :: CAJERO 64750
+    </div>
+
+    <div class="preview-container">
+      <img id="imgPreview" class="preview-img" alt="Documento adjunto">
+    </div>
+
+    <div class="ticket-data">
+      <div><strong>FECHA / HORA (BS.AS.):</strong> <span id="recTime">--</span></div>
+      <div><strong>HASH-ID (SHA-256):</strong> <span id="recHash" style="color: #4c1d95;">--</span></div>
+      <div><strong>PESO / TAMAÑO:</strong> <span id="recSize">--</span></div>
+      <div><strong>ARCHIVO:</strong> <span id="recName">--</span></div>
+      <div><strong>GEOLOCALIZACIÓN:</strong> <span id="recGeo">Obteniendo coordenadas...</span></div>
+    </div>
+
+    <div class="ticket-stamp-box">
+      <div>REGISTRO DE FE CIERTA :: OPERACIÓN VALIDADA DIGITALMENTE</div>
+      <div style="font-size: 0.7rem; margin-top: 3px; font-family: monospace;" id="stampTimeCode">00:00:00.000</div>
+    </div>
+
+    <button class="btn" onclick="downloadThermalTicketJPG()">📥 Descargar Ticket en JPG</button>
+  </div>
+</div>
+
+<!-- Canvas oculto para armar el ticket térmico integrado -->
+<canvas id="exportCanvas" style="display:none;"></canvas>
+
+<script>
+  let currentFile = null;
+  let formattedTimeCache = "";
+  let currentHashHex = "";
+  let geoTextCache = "No disponible";
+  let loadedImageObj = new Image();
+
+  function getBuenosAiresTime(dateObj = new Date()) {
+    const options = {
+      timeZone: 'America/Argentina/Buenos_Aires',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    };
+    
+    const formatter = new Intl.DateTimeFormat('sv-SE', options);
+    const parts = formatter.formatToParts(dateObj);
+    const dateMap = {};
+    parts.forEach(p => dateMap[p.type] = p.value);
+
+    const ms = String(dateObj.getMilliseconds()).padStart(3, '0');
+    return `${dateMap.year}-${dateMap.month}-${dateMap.day} ${dateMap.hour}:${dateMap.minute}:${dateMap.second}.${ms}`;
+  }
+
+  function updateLiveClock() {
+    document.getElementById('liveClock').textContent = getBuenosAiresTime();
+    requestAnimationFrame(updateLiveClock);
+  }
+  requestAnimationFrame(updateLiveClock);
+
+  async function processImage(file) {
+    if (!file) return;
+    currentFile = file;
+
+    formattedTimeCache = getBuenosAiresTime();
+    const timeOnly = formattedTimeCache.split(' ')[1] || formattedTimeCache;
+
+    // Hash SHA-256
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    currentHashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    const sizeInKB = (file.size / 1024).toFixed(2);
+    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeStr = file.size > 1048576 ? `${sizeInMB} MB (${file.size} bytes)` : `${sizeInKB} KB (${file.size} bytes)`;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      document.getElementById('imgPreview').src = dataUrl;
+      
+      loadedImageObj = new Image();
+      loadedImageObj.onload = function() {
+        document.getElementById('recTime').textContent = formattedTimeCache;
+        document.getElementById('recHash').textContent = currentHashHex;
+        document.getElementById('recSize').textContent = sizeStr;
+        document.getElementById('recName').textContent = file.name;
+        document.getElementById('stampTimeCode').textContent = timeOnly;
+        document.getElementById('certificate').style.display = 'block';
+      };
+      loadedImageObj.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+
+    // Geolocalización
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude.toFixed(6);
+          const lon = position.coords.longitude.toFixed(6);
+          const acc = position.coords.accuracy.toFixed(1);
+          geoTextCache = `Lat: ${lat}, Lon: ${lon} (±${acc}m)`;
+          document.getElementById('recGeo').textContent = geoTextCache;
+        },
+        (error) => {
+          geoTextCache = "No disponible";
+          document.getElementById('recGeo').textContent = geoTextCache;
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      geoTextCache = "No soportada";
+      document.getElementById('recGeo').textContent = geoTextCache;
+    }
+  }
+
+  // Generación y descarga del Ticket Térmico Integrado en JPG
+  function downloadThermalTicketJPG() {
+    if (!loadedImageObj.complete || loadedImageObj.naturalWidth === 0) {
+      alert("La imagen aún se está procesando. Aguardá un momento.");
+      return;
+    }
+
+    const canvas = document.getElementById('exportCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const origW = loadedImageObj.naturalWidth;
+    const origH = loadedImageObj.naturalHeight;
+
+    // Altura del bloque de ticket térmico al pie
+    const ticketFooterHeight = Math.max(340, Math.round(origH * 0.32));
+
+    canvas.width = origW;
+    canvas.height = origH + ticketFooterHeight;
+
+    // 1. Fondo general de papel térmico analógico (blanco ligeramente texturado/gris cálido)
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 2. Dibujar la imagen original al 100% de nitidez arriba
+    ctx.drawImage(loadedImageObj, 0, 0, origW, origH);
+
+    // 3. Franja de corte / Línea punteada de matriz de puntos
+    const footerTop = origH;
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = Math.max(3, Math.round(origW * 0.004));
+    ctx.setLineDash([10, 8]);
+    ctx.beginPath();
+    ctx.moveTo(0, footerTop);
+    ctx.lineTo(origW, footerTop);
+    ctx.stroke();
+    ctx.setLineDash([]); // Resetear patrón de línea
+
+    // Fondo del cuerpo del ticket inferior
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(0, footerTop + 4, origW, ticketFooterHeight - 4);
+
+    // Textos con tipografía de impresora de ticket (Courier / Monospace)
+    const padLeft = Math.round(origW * 0.04);
+    const fontHeader = Math.max(12, Math.round(origW * 0.018));
+    const fontBody = Math.max(12, Math.round(origW * 0.019));
+    const fontStamp = Math.max(13, Math.round(origW * 0.021));
+
+    ctx.textAlign = "left";
+
+    // Encabezado térmico
+    ctx.font = "bold " + fontHeader + "px 'Courier New', monospace";
+    ctx.fillStyle = "#475569";
+    ctx.fillText("BOL. 245828 :: COD. ENT. 00027 :: SUC. 053 :: CAJERO 64750", padLeft, footerTop + 35);
+
+    // Datos principales del ticket
+    ctx.font = "bold " + fontBody + "px 'Courier New', monospace";
+    ctx.fillStyle = "#1e293b";
+    
+    let currentY = footerTop + 70;
+    const lineSpacing = Math.round(fontBody * 1.6);
+
+    ctx.fillText("FECHA / HORA (BS.AS.): " + formattedTimeCache, padLeft, currentY);
+    currentY += lineSpacing;
+    
+    ctx.fillText("HASH-ID (SHA-256):", padLeft, currentY);
+    currentY += lineSpacing;
+    
+    ctx.font = "bold " + Math.max(10, Math.round(fontBody * 0.85)) + "px 'Courier New', monospace";
+    ctx.fillStyle = "#4c1d95";
+    ctx.fillText(currentHashHex, padLeft, currentY);
+    currentY += lineSpacing;
+
+    ctx.font = "bold " + fontBody + "px 'Courier New', monospace";
+    ctx.fillStyle = "#1e293b";
+    ctx.fillText("PESO / TAMAÑO: " + (currentFile ? (currentFile.size / 1024).toFixed(2) + " KB" : "--"), padLeft, currentY);
+    currentY += lineSpacing;
+
+    ctx.fillText("GEOLOCALIZACIÓN: " + geoTextCache, padLeft, currentY);
+    currentY += lineSpacing + 5;
+
+    // Sello entintado violáceo inferior (Estilo cajero/escribanía)
+    const stampBoxHeight = 55;
+    const stampBoxWidth = origW - (padLeft * 2);
+    
+    ctx.strokeStyle = "#4c1d95";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(padLeft, currentY, stampBoxWidth, stampBoxHeight);
+
+    ctx.fillStyle = "rgba(76, 29, 149, 0.06)";
+    ctx.fillRect(padLeft, currentY, stampBoxWidth, stampBoxHeight);
+
+    ctx.fillStyle = "#4c1d95";
+    ctx.textAlign = "center";
+    ctx.font = "bold " + fontStamp + "px 'Courier New', monospace";
+    ctx.fillText("REGISTRO DE FE CIERTA :: OPERACIÓN VALIDADA", padLeft + (stampBoxWidth / 2), currentY + 22);
+
+    ctx.font = "bold " + Math.max(11, Math.round(fontStamp * 0.85)) + "px 'Courier New', monospace";
+    const timeOnly = formattedTimeCache.split(' ')[1] || formattedTimeCache;
+    ctx.fillText("HORA EXACTA: " + timeOnly, padLeft + (stampBoxWidth / 2), currentY + 44);
+
+    // 4. Descarga directa en JPG del Ticket Térmico Completo
+    const link = document.createElement('a');
+    link.download = 'Ticket_FeCierta_' + Date.now() + '.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.95);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html>
